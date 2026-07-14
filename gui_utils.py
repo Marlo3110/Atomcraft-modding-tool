@@ -243,3 +243,16 @@ class QStateChange(QWidget):
         super().__init__()
 
         self.target_material_name = MaterialSelector("Target material name: ", mats=mats)
+        self.temperature = QIntegerInputLabel("Temperature: ")
+        self.amount = QIntegerInputLabel("Amount: ")
+        self.probability = QIntegerInputLabel("Probability: ")
+
+        self.container = QCollapsibleSection(txt)
+        self.container.addWidget(self.target_material_name)
+        self.container.addWidget(self.temperature)
+        self.container.addWidget(self.amount)
+        self.container.addWidget(self.probability)
+
+        self.layout = QVBoxLayout()
+        self.layout.addWidget(self.container)
+        self.setLayout(self.layout)

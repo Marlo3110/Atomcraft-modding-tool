@@ -18,6 +18,7 @@ from gui_utils import   (
                         MaterialSelector,
                         QBooleanInputLabel,
                         QEnumSelector,
+                        QStateChange,
                         )
 
 material_fetcher = fetcher.MaterialFetcher()
@@ -205,8 +206,35 @@ class MainWindow(QMainWindow):
         self.material_physics_thermodynamics_default_temperature = QIntegerInputLabel("Default temperature: ", minimum=-999, maximum=10000000)
         self.material_physics_thermodynamics_thermal_conductivity = QIntegerInputLabel("Thermal conductivity: ", minimum=-999)
         self.material_physics_thermodynamics_conductance_divisor = QIntegerInputLabel("Conductance divisor: ")
-        
+
         # physics/thermodynamics/condensation
+        self.material_physics_thermodynamics_condensation = QStateChange("Condensation", mats=materials)
+        # physics/thermodynamics/evaporation
+        self.material_physics_thermodynamics_evaporation = QStateChange("Evaporation", mats=materials)
+
+        self.material_physics_thermodynamics_container = QCollapsibleSection("Thermodynamics")
+        self.material_physics_thermodynamics_container.addWidget(self.material_physics_thermodynamics_is_burning)
+        self.material_physics_thermodynamics_container.addWidget(self.material_physics_thermodynamics_default_temperature)
+        self.material_physics_thermodynamics_container.addWidget(self.material_physics_thermodynamics_thermal_conductivity)
+        self.material_physics_thermodynamics_container.addWidget(self.material_physics_thermodynamics_conductance_divisor)
+        self.material_physics_thermodynamics_container.addWidget(self.material_physics_thermodynamics_condensation)
+        self.material_physics_thermodynamics_container.addWidget(self.material_physics_thermodynamics_evaporation)
+        
+        
+
+        self.material_physics_container = QCollapsibleSection("Physics")
+        self.material_physics_container.addWidget(self.material_physics_weight)
+        self.material_physics_container.addWidget(self.material_physics_density)
+        self.material_physics_container.addWidget(self.material_physics_bounciness)
+        self.material_physics_container.addWidget(self.material_physics_actor_friction)
+        self.material_physics_container.addWidget(self.material_physics_override_actor_collision)
+        self.material_physics_container.addWidget(self.material_physics_direction)
+        self.material_physics_container.addWidget(self.material_physics_is_mechanical)
+        self.material_physics_container.addWidget(self.material_physics_friction)
+        self.material_physics_container.addWidget(self.material_physics_viscosity)
+        self.material_physics_container.addWidget(self.material_physics_explosion_radius)
+        self.material_physics_container.addWidget(self.material_physics_thermodynamics_container)
+
 
 
         self.material_editor_container.setWidget(self.material_editor)
@@ -222,6 +250,7 @@ class MainWindow(QMainWindow):
 
         self.material_editor_layout.addWidget(self.material_decay_settings)
         self.material_editor_layout.addWidget(self.material_player_interaction_container)
+        self.material_editor_layout.addWidget(self.material_physics_container)
 
         
 
