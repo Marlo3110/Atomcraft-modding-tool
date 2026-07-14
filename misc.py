@@ -242,14 +242,14 @@ class MaterialAmount:
 
 @dataclass
 class Ignition:
-    TargetmaterialName: Material = None
+    TargetMaterialName: Material = None
     Temperature: int = None
     RequiresSpark: bool = False
     Explodes: bool = False
 
     def toJSON(self):
         return {
-            "TargetmaterialName": self.TargetmaterialName.Name if self.TargetmaterialName else None,
+            "TargetMaterialName": self.TargetMaterialName.Name if self.TargetMaterialName else None,
             "Temperature": self.Temperature,
             "RequiresSpark": self.RequiresSpark,
             "Explodes": self.Explodes,
@@ -260,7 +260,7 @@ class Ignition:
         if data is None:
             return None
         return cls(
-            TargetmaterialName=data["TargetmaterialName"],  # raw name string, resolved later
+            TargetMaterialName=data["TargetMaterialName"],  # raw name string, resolved later
             Temperature=data["Temperature"],
             RequiresSpark=data["RequiresSpark"],
             Explodes=data["Explodes"],

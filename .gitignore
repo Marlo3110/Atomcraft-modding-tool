@@ -1,0 +1,9 @@
+__pycache__/*
+!__pycache__/.gitkeep
+
+bin/
+lib/
+include/
+lib64/
+activate_venv.sh
+pyvenv.cfg
