@@ -166,83 +166,83 @@ class Material:
 
             DecaySettings=DecaySettings.fromJSON(data["DecaySettings"]),
 
-            PickUpInto=data["PickUpInto"],
-            MinesInto=data["MinesInto"],
-            BuildsInto=data["BuildsInto"],
+            PickUpInto=data["PickUpInto"], # turns into ... from ...
+            MinesInto=data["MinesInto"],# turns into ... from ...
+            BuildsInto=data["BuildsInto"],# turns into ... from ...
 
-            TurnsOnInto=data["TurnsOnInto"],
-            TurnsOffInto=data["TurnsOffInto"],
+            TurnsOnInto=data["TurnsOnInto"],# turns into ... from ...
+            TurnsOffInto=data["TurnsOffInto"],# turns into ... from ...
 
-            RotatesRightInto=data["RotatesRightInto"],
-            RotatesLeftInto=data["RotatesLeftInto"],
-            GrowsInto=data["GrowsInto"],
+            RotatesRightInto=data["RotatesRightInto"],# turns into ... from ...
+            RotatesLeftInto=data["RotatesLeftInto"],# turns into ... from ...
+            GrowsInto=data["GrowsInto"], # plant
 
-            WireIndex=data["WireIndex"],
+            WireIndex=data["WireIndex"], # electronic
 
-            HealthChange=data["HealthChange"],
-            AcidDamage=data["AcidDamage"],
+            HealthChange=data["HealthChange"], # player interaction
+            AcidDamage=data["AcidDamage"], # player interaction
 
-            Weight=data["Weight"],
-            Density=data["Density"],
-            Hardness=data["Hardness"],
+            Weight=data["Weight"], # physics
+            Density=data["Density"],# physics
+            Hardness=data["Hardness"],# physics
 
-            Composition=Composition.fromJSON(data["Composition"]),
-            DissolvesInto=data["DissolvesInto"],
+            Composition=Composition.fromJSON(data["Composition"]), # chemistry
+            DissolvesInto=data["DissolvesInto"], # chemistry
 
-            Bounciness=data["Bounciness"],
-            ActorFriction=data["ActorFriction"],
-            OverrideActorCollision=data["OverrideActorCollision"],
+            Bounciness=data["Bounciness"], # physics
+            ActorFriction=data["ActorFriction"], # physics
+            OverrideActorCollision=data["OverrideActorCollision"], # physics
 
-            IsInteractable=data["IsInteractable"],
-            IsBurning=data["IsBurning"],
-            IgnoreFogOfWar=data["IgnoreFogOfWar"],
-            CanBeCutByPlasma=data["CanBeCutByPlasma"],
+            IsInteractable=data["IsInteractable"], # player interaction
+            IsBurning=data["IsBurning"], # physics/thermodynamics
+            IgnoreFogOfWar=data["IgnoreFogOfWar"], # visual
+            CanBeCutByPlasma=data["CanBeCutByPlasma"], # misc
 
-            Direction=Direction(data["Direction"]) if data["Direction"] is not None else None,
-            IsForeground=data["IsForeground"],
+            Direction=Direction(data["Direction"]) if data["Direction"] is not None else None, # physics
+            IsForeground=data["IsForeground"], # visual
 
-            IsCarryingSignal=data["IsCarryingSignal"],
-            IsUnstable=data["IsUnstable"],
+            IsCarryingSignal=data["IsCarryingSignal"], # electronic
+            IsUnstable=data["IsUnstable"], # radioactivity
 
-            RequiredSupportDirection=Direction(data["RequiredSupportDirection"]) if data["RequiredSupportDirection"] is not None else None,
+            RequiredSupportDirection=Direction(data["RequiredSupportDirection"]) if data["RequiredSupportDirection"] is not None else None, # physics
 
-            DoNotBlockLaser=data["DoNotBlockLaser"],
-            IsBuilt=data["IsBuilt"],
-            IsMechanical=data["IsMechanical"],
+            DoNotBlockLaser=data["DoNotBlockLaser"], # misc
+            IsBuilt=data["IsBuilt"], # misc
+            IsMechanical=data["IsMechanical"], # physics
 
-            CanPickUpStatic=data["CanPickUpStatic"],
-            IsOn=data["IsOn"],
+            CanPickUpStatic=data["CanPickUpStatic"], # player interaction
+            IsOn=data["IsOn"], # electronics
 
-            WireSignalState=WireSignalState(data["WireSignalState"]) if data["WireSignalState"] is not None else None,
+            WireSignalState=WireSignalState(data["WireSignalState"]) if data["WireSignalState"] is not None else None, # electronics
 
-            DoNotShowInGuide=data["DoNotShowInGuide"],
-            IsFoodIngredient=data["IsFoodIngredient"],
+            DoNotShowInGuide=data["DoNotShowInGuide"], # misc
+            IsFoodIngredient=data["IsFoodIngredient"], # plant
 
-            MaterialAudioTypeId=data["MaterialAudioTypeId"],
+            MaterialAudioTypeId=data["MaterialAudioTypeId"], # misc
 
-            GrowthRules=GrowthRules.fromJSON(data["GrowthRules"]),
-            GrowthMedium=data["GrowthMedium"],
+            GrowthRules=GrowthRules.fromJSON(data["GrowthRules"]), # plant
+            GrowthMedium=data["GrowthMedium"], # plant
 
-            Friction=data["Friction"],
-            Viscosity=data["Viscosity"],
+            Friction=data["Friction"], # physics
+            Viscosity=data["Viscosity"], # physics
 
-            DefaultTemperature=data["DefaultTemperature"],
-            ThermalConductivity=data["ThermalConductivity"],
-            ConductanceDivisor=data["ConductanceDivisor"],
+            DefaultTemperature=data["DefaultTemperature"], #  physics/thermodynamics
+            ThermalConductivity=data["ThermalConductivity"], #  physics/thermodynamics
+            ConductanceDivisor=data["ConductanceDivisor"], #  physics/thermodynamics
 
-            ColorDelegate=data["ColorDelegate"],
+            ColorDelegate=data["ColorDelegate"], # visual
 
-            Alpha=data["Alpha"],
+            Alpha=data["Alpha"], # visual
 
-            LightColor=Color.fromJSON(data["LightColor"]),
-            LightRange=data["LightRange"],
+            LightColor=Color.fromJSON(data["LightColor"]), # visual
+            LightRange=data["LightRange"], # visual
 
-            Condensation=StateChange.fromJSON(data["Condensation"]),
-            Evaporation=StateChange.fromJSON(data["Evaporation"]),
+            Condensation=StateChange.fromJSON(data["Condensation"]), #  physics/thermodynamics
+            Evaporation=StateChange.fromJSON(data["Evaporation"]), #  physics/thermodynamics
 
-            Fire=Fire.fromJSON(data["Fire"]),
+            Fire=Fire.fromJSON(data["Fire"]), # visual
 
-            ExplosionRadius=data["ExplosionRadius"],
+            ExplosionRadius=data["ExplosionRadius"], # physics
             
-            DropRates=DropRates.fromJSON(data["DropRates"]),
+            DropRates=DropRates.fromJSON(data["DropRates"]), # misc
         )

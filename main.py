@@ -5,13 +5,20 @@ from reaction import Reaction
 from dataclasses import asdict
 from json import dumps
 from enum import Enum
-from PyQt6.QtCore import QSize, Qt
+from PyQt6.QtCore import QSize, Qt, QMargins
 from PyQt6.QtWidgets import (QApplication, QMainWindow, QPushButton, QLineEdit,
                              QGridLayout, QWidget, QListWidget, QListWidgetItem,
                               QToolBar, QSplitter, QMenu, QTabWidget, QVBoxLayout,
-                              QLabel, QComboBox, QSpinBox, QCompleter, QScrollArea)
+                              QLabel, QComboBox, QSpinBox, QCompleter, QScrollArea,
+                              QSizePolicy)
 from PyQt6.QtGui import QIcon, QPixmap, QColor
-from gui_utils import CollapsibleSection
+from gui_utils import   ( 
+                        QCollapsibleSection,
+                        QIntegerInputLabel,
+                        MaterialSelector,
+                        QBooleanInputLabel,
+                        QEnumSelector,
+                        )
 
 material_fetcher = fetcher.MaterialFetcher()
 reaction_fetcher = fetcher.ReactionFetcher()
@@ -96,120 +103,132 @@ class MainWindow(QMainWindow):
         self.material_editor = QWidget()
         self.material_name = QLineEdit()
 
+
         self.material_color = QLabel()
-        self.material_color.setStyleSheet("background-color: rgba(255,0,0,0); margin:5px; border:2px solid rgb(255, 255, 255); ")
+        self.material_color.setStyleSheet("background-color: rgba(0,0,0,0); margin:1px; border:2px solid rgb(255, 255, 255); ")
+        self.material_color.setMaximumSize(QSize(50,50))
 
         self.material_description = QLineEdit("description")
 
         self.material_state = QComboBox()
         self.material_state.addItems([state.name for state in State])
         
-        self.material_proton_number = QSpinBox()
-        self.material_proton_number.setMinimum(0)
-        self.material_proton_number.setMaximum(999)
-        self.material_proton_number.setMinimumWidth(125)
-        self.material_proton_number.setMaximumWidth(125)
-        self.material_proton_number.setPrefix("Protons: ")
-
-        self.material_neutron_number = QSpinBox()
-        self.material_neutron_number.setMinimum(0)
-        self.material_neutron_number.setMaximum(999)
-        self.material_neutron_number.setMinimumWidth(125)
-        self.material_neutron_number.setMaximumWidth(125)
-        self.material_neutron_number.setPrefix("Neutrons: ")
+        material_title_container_layout = QGridLayout()
+        material_title_container_layout.addWidget(self.material_name, 0, 0)
+        material_title_container_layout.addWidget(self.material_color, 0, 1)
+        material_title_container_layout.addWidget(self.material_description, 1, 0)
+        material_title_container_layout.addWidget(self.material_state, 1, 1)
+        self.material_title_container = QWidget()
+        self.material_title_container.setLayout(material_title_container_layout)
+        self.material_title_container.setSizePolicy(
+            QSizePolicy.Policy.Expanding,
+            QSizePolicy.Policy.Fixed
+        )
 
 
-        self.material_turns_into_from_alpha_particle_impact_label = QLabel("Turns into on alpha particle impact: ")
-        self.material_turns_into_from_alpha_particle_impact = QComboBox()
-        self.material_turns_into_from_alpha_particle_impact.addItem("None")
-        self.material_turns_into_from_alpha_particle_impact.addItems([mat.Name for mat in materials])
-        self.material_turns_into_from_alpha_particle_impact.setEditable(True)
-        self.material_turns_into_from_alpha_particle_impact.setInsertPolicy(QComboBox.InsertPolicy.NoInsert)
-        self.material_turns_into_from_alpha_particle_impact.completer().setCompletionMode(QCompleter.CompletionMode.InlineCompletion)
-        self.material_turns_into_from_alpha_particle_impact.completer().setModelSorting(QCompleter.ModelSorting.CaseInsensitivelySortedModel)
+        # atomic info
+        self.material_proton_number = QIntegerInputLabel("Protons: ", "")
+        self.material_neutron_number = QIntegerInputLabel("Neutrons: ", "")
 
-        self.material_turns_into_from_proton_impact_label = QLabel("Turns into on proton impact: ")
-        self.material_turns_into_from_proton_impact = QComboBox()
-        self.material_turns_into_from_proton_impact.addItem("None")
-        self.material_turns_into_from_proton_impact.addItems([mat.Name for mat in materials])
-        self.material_turns_into_from_proton_impact.setEditable(True)
-        self.material_turns_into_from_proton_impact.setInsertPolicy(QComboBox.InsertPolicy.NoInsert)
-        self.material_turns_into_from_proton_impact.completer().setCompletionMode(QCompleter.CompletionMode.InlineCompletion)
-        self.material_turns_into_from_proton_impact.completer().setModelSorting(QCompleter.ModelSorting.CaseInsensitivelySortedModel)
+        self.material_atomic_info_container = QCollapsibleSection("Atomic info")
+        self.material_atomic_info_container.addWidget(self.material_proton_number)
+        self.material_atomic_info_container.addWidget(self.material_neutron_number)
 
-        self.material_turns_into_from_neutron_impact_label = QLabel("Turns into on neutron impact: ")
-        self.material_turns_into_from_neutron_impact = QComboBox()
-        self.material_turns_into_from_neutron_impact.addItem("None")
-        self.material_turns_into_from_neutron_impact.addItems([mat.Name for mat in materials])
-        self.material_turns_into_from_neutron_impact.setEditable(True)
-        self.material_turns_into_from_neutron_impact.setInsertPolicy(QComboBox.InsertPolicy.NoInsert)
-        self.material_turns_into_from_neutron_impact.completer().setCompletionMode(QCompleter.CompletionMode.InlineCompletion)
-        self.material_turns_into_from_neutron_impact.completer().setModelSorting(QCompleter.ModelSorting.CaseInsensitivelySortedModel)
+        #turns into
+        self.material_turns_into_from_alpha_particle = MaterialSelector("Turns into from alpha particle impact: ", mats=materials)
+        self.material_turns_into_from_proton_impact = MaterialSelector("Turns into from proton impact: ", mats=materials)
+        self.material_turns_into_from_neutron_impact = MaterialSelector("Turns into from neutron impact: ", mats=materials)
 
-        # decay settings here yeah
+        self.material_picks_up_into = MaterialSelector("Picks up into: ", mats=materials)
+        self.material_mines_into = MaterialSelector("Mines into: ", mats=materials)
+        self.material_builds_into = MaterialSelector("Builds into: ", mats=materials)
 
+        self.material_turns_right_into = MaterialSelector("Rotates right into: ", mats=materials)
+        self.material_turns_left_into = MaterialSelector("Rotates left into: ", mats=materials)
+        self.material_grows_into = MaterialSelector("Grows into: ", mats=materials)
 
+        self.material_turns_into_container = QCollapsibleSection("Turns into ... from ...")
+        self.material_turns_into_container.addWidget(self.material_turns_into_from_alpha_particle)
+        self.material_turns_into_container.addWidget(self.material_turns_into_from_proton_impact)
+        self.material_turns_into_container.addWidget(self.material_turns_into_from_neutron_impact)
 
+        self.material_turns_into_container.addWidget(self.material_picks_up_into)
+        self.material_turns_into_container.addWidget(self.material_mines_into)
+        self.material_turns_into_container.addWidget(self.material_builds_into)
 
-        #
-        self.material_picks_up_into_label = QLabel("Picks up into: ")
-        self.material_picks_up_into = QComboBox()
-        self.material_picks_up_into.addItem("None")
-        self.material_picks_up_into.addItems([mat.Name for mat in materials])
-        self.material_picks_up_into.setEditable(True)
-        self.material_picks_up_into.setInsertPolicy(QComboBox.InsertPolicy.NoInsert)
-        self.material_picks_up_into.completer().setCompletionMode(QCompleter.CompletionMode.InlineCompletion)
-        self.material_picks_up_into.completer().setModelSorting(QCompleter.ModelSorting.CaseInsensitivelySortedModel)
+        self.material_turns_into_container.addWidget(self.material_turns_right_into)
+        self.material_turns_into_container.addWidget(self.material_turns_left_into)
 
-        self.material_mines_into_label = QLabel("Mines into: ")
-        self.material_mines_into = QComboBox()
-        self.material_mines_into.addItem("None")
-        self.material_mines_into.addItems([mat.Name for mat in materials])
-        self.material_mines_into.setEditable(True)
-        self.material_mines_into.setInsertPolicy(QComboBox.InsertPolicy.NoInsert)
-        self.material_mines_into.completer().setCompletionMode(QCompleter.CompletionMode.InlineCompletion)
-        self.material_mines_into.completer().setModelSorting(QCompleter.ModelSorting.CaseInsensitivelySortedModel)
+        self.material_turns_into_container.addWidget(self.material_grows_into)
 
-        self.material_builds_into_label = QLabel("builds into: ")
-        self.material_builds_into = QComboBox()
-        self.material_builds_into.addItem("None")
-        self.material_builds_into.addItems([mat.Name for mat in materials])
-        self.material_builds_into.setEditable(True)
-        self.material_builds_into.setInsertPolicy(QComboBox.InsertPolicy.NoInsert)
-        self.material_builds_into.completer().setCompletionMode(QCompleter.CompletionMode.InlineCompletion)
-        self.material_builds_into.completer().setModelSorting(QCompleter.ModelSorting.CaseInsensitivelySortedModel)
+        # decay settings
+        self.material_decay_settings_decay_mode = QComboBox()
+        self.material_decay_settings_decay_mode.addItems([mode.name for mode in DecayMode])
+        self.material_decay_settings_tick_mod_value = QIntegerInputLabel("Tick modifier value: ")
+        self.material_decay_settings_material_name = MaterialSelector("Material name: ", materials)
+        self.material_decay_settings_material_name2 = MaterialSelector("Material name 2: ", materials)
+
+        self.material_decay_settings = QCollapsibleSection("Decay settings")
+        self.material_decay_settings.addWidget(self.material_decay_settings_decay_mode)
+        self.material_decay_settings.addWidget(self.material_decay_settings_tick_mod_value)
+        self.material_decay_settings.addWidget(self.material_decay_settings_material_name)
+        self.material_decay_settings.addWidget(self.material_decay_settings_material_name2)
 
 
+        # player interaction
+        self.material_player_interaction_health_change = QIntegerInputLabel("Player health change: ", minimum=-999)
+        self.material_player_interaction_acid_damage = QIntegerInputLabel("Player acid damage: ", minimum=-999)
+        self.material_player_interaction_is_interactable = QBooleanInputLabel("Is interactable: ")
+        self.material_player_interaction_can_pick_up_static = QBooleanInputLabel("Can pick up static: ")
+        
+        self.material_player_interaction_container = QCollapsibleSection("Player interaction")
+        self.material_player_interaction_container.addWidget(self.material_player_interaction_health_change)
+        self.material_player_interaction_container.addWidget(self.material_player_interaction_acid_damage)
+        self.material_player_interaction_container.addWidget(self.material_player_interaction_is_interactable)
+        self.material_player_interaction_container.addWidget(self.material_player_interaction_can_pick_up_static)
+
+        # physics
+        self.material_physics_weight = QIntegerInputLabel("Weight: ")
+        self.material_physics_density = QIntegerInputLabel("Density: ")
+        self.material_physics_hardness = QIntegerInputLabel("Hardness: ")
+        self.material_physics_bounciness = QIntegerInputLabel("Bounciness: ")
+        self.material_physics_actor_friction = QIntegerInputLabel("Actor friction: ")
+        self.material_physics_override_actor_collision = QBooleanInputLabel("Override actor collision: ")
+        self.material_physics_direction = QEnumSelector("Direction: ", Direction, Direction.UP)
+        self.material_physics_is_mechanical = QBooleanInputLabel("Is mechanical: ")
+        self.material_physics_friction = QIntegerInputLabel("Friction: ")
+        self.material_physics_viscosity = QIntegerInputLabel("Viscosity: ")
+        self.material_physics_explosion_radius = QIntegerInputLabel("Explosion radius: ")
+
+        # physics/thermodynamics
+        self.material_physics_thermodynamics_is_burning = QBooleanInputLabel("Is burning: ")
+        self.material_physics_thermodynamics_default_temperature = QIntegerInputLabel("Default temperature: ", minimum=-999, maximum=10000000)
+        self.material_physics_thermodynamics_thermal_conductivity = QIntegerInputLabel("Thermal conductivity: ", minimum=-999)
+        self.material_physics_thermodynamics_conductance_divisor = QIntegerInputLabel("Conductance divisor: ")
+        
+        # physics/thermodynamics/condensation
 
 
         self.material_editor_container.setWidget(self.material_editor)
-        self.material_editor_layout = QGridLayout(self.material_editor)
+        self.material_editor_layout = QVBoxLayout()
+        self.material_editor_layout.setSpacing(5)
+        self.material_editor_layout.setContentsMargins(QMargins(5, 5, 5, 5))
         
-        self.material_editor_layout.addWidget(self.material_name, 0, 0)
-        self.material_editor_layout.addWidget(self.material_color, 0, 1)
-        self.material_editor_layout.addWidget(self.material_description, 1, 0, 1, 2)
-        self.material_editor_layout.addWidget(self.material_state, 2, 0)
-        self.material_editor_layout.addWidget(self.material_proton_number, 3, 0)
-        self.material_editor_layout.addWidget(self.material_neutron_number, 3, 1)
 
-        self.material_editor_layout.addWidget(self.material_turns_into_from_alpha_particle_impact_label, 4, 0)
-        self.material_editor_layout.addWidget(self.material_turns_into_from_alpha_particle_impact, 4, 1)
-        self.material_editor_layout.addWidget(self.material_turns_into_from_proton_impact_label, 5, 0)
-        self.material_editor_layout.addWidget(self.material_turns_into_from_proton_impact, 5, 1)
-        self.material_editor_layout.addWidget(self.material_turns_into_from_neutron_impact_label, 6, 0)
-        self.material_editor_layout.addWidget(self.material_turns_into_from_neutron_impact, 6, 1)
-        self.material_editor_layout.setRowMinimumHeight(7, 20)
-        self.material_editor_layout.addWidget(self.material_picks_up_into_label, 8, 0)
-        self.material_editor_layout.addWidget(self.material_picks_up_into, 8, 1)
-        self.material_editor_layout.addWidget(self.material_mines_into_label, 9, 0)
-        self.material_editor_layout.addWidget(self.material_mines_into, 9, 1)
-        self.material_editor_layout.addWidget(self.material_builds_into_label, 10, 0)
-        self.material_editor_layout.addWidget(self.material_builds_into, 10, 1)
+        self.material_editor_layout.addWidget(self.material_title_container)
+        self.material_editor_layout.addWidget(self.material_atomic_info_container)
+
+        self.material_editor_layout.addWidget(self.material_turns_into_container)
+
+        self.material_editor_layout.addWidget(self.material_decay_settings)
+        self.material_editor_layout.addWidget(self.material_player_interaction_container)
 
         
 
-
+        self.material_editor_layout.setAlignment(Qt.AlignmentFlag.AlignTop)
+        self.material_editor_layout.addStretch()
         self.material_editor.setLayout(self.material_editor_layout)
+        
         self.update_material_editor()
 
 
