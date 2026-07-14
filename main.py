@@ -235,8 +235,16 @@ class MainWindow(QMainWindow):
         self.material_physics_container.addWidget(self.material_physics_explosion_radius)
         self.material_physics_container.addWidget(self.material_physics_thermodynamics_container)
 
+        # plant
+
+        # electronics
+        
+        # visual
+
+        
 
 
+        # adding widgets
         self.material_editor_container.setWidget(self.material_editor)
         self.material_editor_layout = QVBoxLayout()
         self.material_editor_layout.setSpacing(5)

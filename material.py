@@ -180,7 +180,7 @@ class Material:
             RotatesLeftInto=data["RotatesLeftInto"],# turns into ... from ...
             GrowsInto=data["GrowsInto"], # plant
 
-            WireIndex=data["WireIndex"], # electronic
+            WireIndex=data["WireIndex"], # electronics
 
             HealthChange=data["HealthChange"], # player interaction
             AcidDamage=data["AcidDamage"], # player interaction
