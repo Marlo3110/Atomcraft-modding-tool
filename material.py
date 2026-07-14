@@ -101,6 +101,8 @@ class Material:
 
     DropRates: DropRates | None = None
 
+    Ignition: Ignition | None = None
+
     def toJSON(self) -> dict:
         def mat_name(m):
             return m.Name if isinstance(m, Material) else m
@@ -136,6 +138,7 @@ class Material:
         dict_["GrowthRules"] = self.GrowthRules.toJSON() if self.GrowthRules is not None else None
         dict_["Condensation"] = self.Condensation.toJSON() if self.Condensation is not None else None
         dict_["Evaporation"] = self.Evaporation.toJSON() if self.Evaporation is not None else None
+        dict_["Ignition"] = self.Ignition.toJSON() if self.Ignition is not None else None
 
         return dict_
     
@@ -245,4 +248,6 @@ class Material:
             ExplosionRadius=data["ExplosionRadius"], # physics
             
             DropRates=DropRates.fromJSON(data["DropRates"]), # misc
+
+            Ignition=Ignition.fromJSON(data.get("Ignition")), # combustion/ignition
         )
