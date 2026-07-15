@@ -10,6 +10,11 @@ from PyQt6.QtWidgets import (
     QCompleter,
     QSizePolicy,
     QCheckBox,
+    QListView,
+    QPushButton,
+    QColorDialog,
+    QListWidget,
+    QListWidgetItem,
 )
 from PyQt6.QtGui import (
     QIcon,
@@ -165,7 +170,7 @@ class QBooleanInputLabel(QWidget):
 class MaterialSelector(QWidget):
     inputChanged = pyqtSignal(Material)
 
-    def __init__(self, txt:str = "", mats:list[Material] = [], normal_value:Material|str = ""):
+    def __init__(self, txt:str = "", mats:list[Material] = [], normal_value:Material|str = "", label:bool = True):
         
         super().__init__()
         self.mats = mats
@@ -187,7 +192,8 @@ class MaterialSelector(QWidget):
         self.decider.editTextChanged.connect(self.__input_changed__)
 
         layout = QHBoxLayout()
-        layout.addWidget(self.label)
+        if label:
+            layout.addWidget(self.label)
         layout.addWidget(self.decider)
         self.setLayout(layout)
         self.setContentsMargins(QMargins(1, 1, 1, 1))
@@ -196,6 +202,77 @@ class MaterialSelector(QWidget):
         mat = find_material_in_materials(txt, mats=self.mats)
         if mat != None:
             self.inputChanged.emit(mat)
+
+# add list where you can add materials
+class MaterialList(QWidget):
+    inputChanged = pyqtSignal(bool)  # emitted whenever the list of materials changes
+
+    def __init__(self, text: str = "", mats: list[Material] = []):
+        super().__init__()
+
+        self.mats = mats
+        self.material_widgets: list[MaterialSelector] = []  # instance attr, not class attr
+
+        self.add_button = QPushButton("Add")
+        self.remove_button = QPushButton("Remove")
+        self.label = QLabel(text=text)
+
+        self.title_bar_layout = QHBoxLayout()
+        self.title_bar_layout.addWidget(self.label)
+        self.title_bar_layout.addWidget(self.add_button)
+        self.title_bar_layout.addWidget(self.remove_button)
+
+        self.title_bar = QWidget()
+        self.title_bar.setLayout(self.title_bar_layout)
+
+        self.list = QListWidget()
+
+        self.layout = QVBoxLayout()
+        self.layout.addWidget(self.title_bar)
+        self.layout.addWidget(self.list)
+
+        self.setLayout(self.layout)
+
+        self.add_button.clicked.connect(self.__new_material__)
+        self.remove_button.clicked.connect(self.__remove_material__)
+
+    def __new_material__(self):
+        selector = MaterialSelector(mats=self.mats, label=False)
+        selector.inputChanged.connect(lambda _: self.inputChanged.emit(True))
+
+        item = QListWidgetItem(self.list)
+        item.setSizeHint(selector.sizeHint())
+
+        self.list.addItem(item)
+        self.list.setItemWidget(item, selector)
+
+        self.material_widgets.append(selector)
+        self.inputChanged.emit(True)
+
+    def __remove_material__(self):
+        if len(self.material_widgets) == 0:
+            return
+
+        row = self.list.currentRow()
+        if row == -1:
+            row = len(self.material_widgets) - 1
+
+        self.material_widgets.pop(row)
+        self.list.takeItem(row)
+
+        self.inputChanged.emit(True)
+
+    def get_materials(self) -> list[Material]:
+        """Return the Material objects currently selected in the list."""
+        materials = []
+        for selector in self.material_widgets:
+            text = selector.decider.currentText()
+            mat = find_material_in_materials(text, mats=self.mats)
+            if mat is not None:
+                materials.append(mat)
+        return materials
+
+
 
 class QEnumSelector(QWidget):
     inputChanged = pyqtSignal(object)  # emits the selected enum member
@@ -256,3 +333,66 @@ class QStateChange(QWidget):
         self.layout = QVBoxLayout()
         self.layout.addWidget(self.container)
         self.setLayout(self.layout)
+
+class ColorButton(QPushButton):
+    colorChanged = pyqtSignal(QColor)
+
+    def __init__(self, color=QColor("white")):
+        super().__init__()
+
+        self._default = QColor(color)
+        self._color = QColor(color)
+
+        self.setFixedSize(40, 24)
+        self.update_style()
+
+    def update_style(self):
+        self.setStyleSheet(f"""
+            QPushButton {{
+                background: {self._color.name()};
+                border: 1px solid gray;
+                border-radius: 4px;
+            }}
+        """)
+
+    def setColor(self, color):
+        self._color = QColor(color)
+        self.update_style()
+        self.colorChanged.emit(self._color)
+
+    def color(self):
+        return QColor(self._color)
+
+    def mousePressEvent(self, event):
+        if event.button() == Qt.MouseButton.LeftButton:
+            color = QColorDialog.getColor(self._color, self)
+            if color.isValid():
+                self.setColor(color)
+
+        elif event.button() == Qt.MouseButton.RightButton:
+            self.setColor(self._default)
+
+        super().mousePressEvent(event)
+
+class QColorSelector(QWidget):
+    inputChanged = pyqtSignal(QColor)
+
+    def __init__(self, txt="", color=QColor("white"), label:bool = True):
+        super().__init__()
+
+        self.label = QLabel(txt)
+        self.button = ColorButton(color)
+
+        self.button.colorChanged.connect(self.inputChanged)
+
+        layout = QHBoxLayout(self)
+        if label:
+            layout.addWidget(self.label)
+        layout.addWidget(self.button)
+        layout.addStretch()
+
+    def value(self):
+        return self.button.color()
+
+    def setValue(self, color):
+        self.button.setColor(color)

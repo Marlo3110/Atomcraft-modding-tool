@@ -74,8 +74,8 @@ class Color:
 class Fire:
     ExtinguishTargetMaterialName: Material = None
     CombustionTargetMaterialNames: list[Material] = None
-    HeatOutput: float = 0
-    PercentChanceToSpread: float = 0
+    HeatOutput: int = 0
+    PercentChanceToSpread: int = 0
     FlameColor: Color = None
 
     def toJSON(self):

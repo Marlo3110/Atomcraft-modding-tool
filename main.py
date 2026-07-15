@@ -19,6 +19,8 @@ from gui_utils import   (
                         QBooleanInputLabel,
                         QEnumSelector,
                         QStateChange,
+                        QColorSelector,
+                        MaterialList,
                         )
 
 material_fetcher = fetcher.MaterialFetcher()
@@ -264,7 +266,47 @@ class MainWindow(QMainWindow):
 
         # visual
 
-        #misc
+        self.material_visual_ignrore_fog_of_war = QBooleanInputLabel("Ignore fog of war: ")
+        self.material_visual_is_foreground = QBooleanInputLabel("Is foreground: ")
+        self.material_visual_color_delegate = MaterialSelector("Color delegate: ", mats=materials)
+        self.material_visual_alpha = QIntegerInputLabel("Transparency: ")
+
+        # light
+        self.material_visual_light_color = QColorSelector("Light color: ")
+        self.material_visual_light_range = QIntegerInputLabel("Light range: ")
+
+        self.material_visual_light_container = QCollapsibleSection("Light")
+        self.material_visual_light_container.addWidget(self.material_visual_light_color)
+        self.material_visual_light_container.addWidget(self.material_visual_light_range)
+        
+        # 🔥 (No, I actually did not use ChatGPT for this. I copied the emoji from emojipedia.org)
+        self.material_visual_fire_heat_output = QIntegerInputLabel("Heat output: ")
+        self.material_visual_fire_percent_chance_to_spread = QIntegerInputLabel(r"% chance to spread: ")
+        self.material_visual_fire_flame_color = QColorSelector("Flame color: ")
+        self.material_visual_fire_extinguish_target_material_name = MaterialSelector("Extinguish target material name: ", mats=materials)
+        self.material_visual_fire_combustion_target_material_names = MaterialList("Combustion target material name: ", mats=materials)
+
+        self.material_visual_fire_combustion_target_material_names.setMinimumHeight(200)
+        
+
+        self.material_visual_fire_container = QCollapsibleSection("🔥")
+        self.material_visual_fire_container.addWidget(self.material_visual_fire_heat_output)
+        self.material_visual_fire_container.addWidget(self.material_visual_fire_percent_chance_to_spread)
+        self.material_visual_fire_container.addWidget(self.material_visual_fire_flame_color)
+        self.material_visual_fire_container.addWidget(self.material_visual_fire_extinguish_target_material_name)
+        self.material_visual_fire_container.addWidget(self.material_visual_fire_combustion_target_material_names)
+
+        self.material_visual_container = QCollapsibleSection("Visual")
+        self.material_visual_container.addWidget(self.material_visual_ignrore_fog_of_war)
+        self.material_visual_container.addWidget(self.material_visual_is_foreground)
+        self.material_visual_container.addWidget(self.material_visual_color_delegate)
+        self.material_visual_container.addWidget(self.material_visual_alpha)
+        self.material_visual_container.addWidget(self.material_visual_light_container)
+        self.material_visual_container.addWidget(self.material_visual_fire_container)
+
+        # misc
+
+        # chemistry
 
 
         # adding widgets
@@ -284,7 +326,7 @@ class MainWindow(QMainWindow):
         self.material_editor_layout.addWidget(self.material_physics_container)
         self.material_editor_layout.addWidget(self.material_plant_container)
         self.material_editor_layout.addWidget(self.material_electronics_container)
-
+        self.material_editor_layout.addWidget(self.material_visual_container)
         
 
         self.material_editor_layout.setAlignment(Qt.AlignmentFlag.AlignTop)
