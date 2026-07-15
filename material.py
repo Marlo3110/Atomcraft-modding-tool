@@ -36,18 +36,18 @@ class Material:
 
     WireIndex: int | None = None
 
-    HealthChange: float = 0
-    AcidDamage: float = 0
+    HealthChange: int = 0
+    AcidDamage: int = 0
 
-    Weight: float = 0
-    Density: float = 0
-    Hardness: float = 0
+    Weight: int = 0
+    Density: int = 0
+    Hardness: int = 0
 
     Composition: Composition | None = None
     DissolvesInto: Material | None = None
 
-    Bounciness: float = 0
-    ActorFriction: float | None = None
+    Bounciness: int = 0
+    ActorFriction: int | None = None
     OverrideActorCollision: bool | None = None
 
     IsInteractable: bool = False
@@ -80,16 +80,16 @@ class Material:
     GrowthRules: GrowthRules | None = None
     GrowthMedium: Material | None = None
 
-    Friction: float = 0
-    Viscosity: float = 0
+    Friction: int = 0
+    Viscosity: int = 0
 
-    DefaultTemperature: float | None = None
-    ThermalConductivity: float | None = None
-    ConductanceDivisor: float | None = None
+    DefaultTemperature: int | None = None
+    ThermalConductivity: int | None = None
+    ConductanceDivisor: int | None = None
 
     ColorDelegate: Material | None = None
 
-    Alpha: float = 0.0
+    Alpha: int = 0.0
 
     LightColor: Color | None = None
     LightRange: int | None = None
