@@ -146,7 +146,6 @@ class MainWindow(QMainWindow):
 
         self.material_turns_right_into = MaterialSelector("Rotates right into: ", mats=materials)
         self.material_turns_left_into = MaterialSelector("Rotates left into: ", mats=materials)
-        self.material_grows_into = MaterialSelector("Grows into: ", mats=materials)
 
         self.material_turns_into_container = QCollapsibleSection("Turns into ... from ...")
         self.material_turns_into_container.addWidget(self.material_turns_into_from_alpha_particle)
@@ -159,8 +158,6 @@ class MainWindow(QMainWindow):
 
         self.material_turns_into_container.addWidget(self.material_turns_right_into)
         self.material_turns_into_container.addWidget(self.material_turns_left_into)
-
-        self.material_turns_into_container.addWidget(self.material_grows_into)
 
         # decay settings
         self.material_decay_settings_decay_mode = QComboBox()
@@ -236,12 +233,31 @@ class MainWindow(QMainWindow):
         self.material_physics_container.addWidget(self.material_physics_thermodynamics_container)
 
         # plant
+        self.material_plant_grows_into = MaterialSelector("Grows into", mats=materials)
+        self.material_plant_is_food_ingredient = QBooleanInputLabel("Is food ingredient: ")
+
+        # plant/growth rules
+        self.material_plant_growth_rules_direction = QEnumSelector("Direction: ", Direction, Direction.UP)
+        self.material_plant_growth_rules_medium_type = QEnumSelector("Growth medium: ", MediumType, MediumType.DIRT)
+        self.material_plant_growth_rules_growth_rate = QIntegerInputLabel("Growth rate: ")
+        self.material_plant_growth_rules_growth_material_name = MaterialSelector("Growth material name: ", mats=materials)
+
+        self.material_plant_growth_rules_container = QCollapsibleSection("Growth rules")
+        self.material_plant_growth_rules_container.addWidget(self.material_plant_growth_rules_direction)
+        self.material_plant_growth_rules_container.addWidget(self.material_plant_growth_rules_medium_type)
+        self.material_plant_growth_rules_container.addWidget(self.material_plant_growth_rules_growth_rate)
+        self.material_plant_growth_rules_container.addWidget(self.material_plant_growth_rules_growth_material_name)
+
+        self.material_plant_container = QCollapsibleSection("Plant")
+        self.material_plant_container.addWidget(self.material_plant_grows_into)
+        self.material_plant_container.addWidget(self.material_plant_is_food_ingredient)
+        self.material_plant_container.addWidget(self.material_plant_growth_rules_container)
 
         # electronics
         
         # visual
 
-        
+        #misc
 
 
         # adding widgets
@@ -259,6 +275,7 @@ class MainWindow(QMainWindow):
         self.material_editor_layout.addWidget(self.material_decay_settings)
         self.material_editor_layout.addWidget(self.material_player_interaction_container)
         self.material_editor_layout.addWidget(self.material_physics_container)
+        self.material_editor_layout.addWidget(self.material_plant_container)
 
         
 
