@@ -67,8 +67,8 @@ class MaterialFetcher:
                 i.GrowsInto = get_material_reference(i.GrowsInto, allmats)
             if i.Composition != None:
                 for j in i.Composition.Elements:
-                    if j["Item1"] != None:
-                        j["Item1"] = get_material_reference(j["Item1"], allmats)
+                    if j != None:
+                        j.MaterialName = get_material_reference(j.MaterialName, allmats)
             if i.DissolvesInto != None:
                 i.DissolvesInto = get_material_reference(i.DissolvesInto, allmats)
             if i.GrowthRules != None:

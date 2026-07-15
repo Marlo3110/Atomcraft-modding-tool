@@ -102,15 +102,12 @@ class Fire:
 
 @dataclass
 class Composition:
-    Elements: list[dict[str, Material, int]] = None
+    Elements: list[MaterialAmount] = None
 
     def toJSON(self):
         return {
             "Elements": [
-                {
-                    "Item1": element["Item1"].Name if element["Item1"] else None,
-                    "Item2": element["Item2"],
-                } for element in self.Elements
+                element.toJSON() for element in self.Elements
             ] if self.Elements else None
         }
 
@@ -121,7 +118,7 @@ class Composition:
         elements = data.get("Elements")
         return cls(
             Elements=[
-                {"Item1": e["Item1"], "Item2": e["Item2"]}  # Item1 stays a raw name string, resolved later
+                MaterialAmount.fromJSON(e)
                 for e in elements
             ] if elements else None
         )
@@ -233,12 +230,22 @@ class StateChange:
 @dataclass
 class MaterialAmount:
     MaterialName: Material = None
-    Amount:int = 0
+    Amount: int = 0
 
     def toJSON(self):
         return {
-            self.MaterialName.Name: self.Amount
+            "Item1": self.MaterialName.Name if self.MaterialName else None,
+            "Item2": self.Amount,
         }
+
+    @classmethod
+    def fromJSON(cls, data):
+        if data is None:
+            return None
+        return cls(
+            MaterialName=data["Item1"],  # raw name string, resolved later
+            Amount=data["Item2"],
+        )
 
 @dataclass
 class Ignition:

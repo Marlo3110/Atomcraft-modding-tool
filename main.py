@@ -22,6 +22,7 @@ from gui_utils import   (
                         QColorSelector,
                         MaterialList,
                         MaterialAmountList,
+                        QTextInputLabel,
                         )
 
 material_fetcher = fetcher.MaterialFetcher()
@@ -324,6 +325,14 @@ class MainWindow(QMainWindow):
 
 
         # chemistry
+        self.material_chemistry_formula = QTextInputLabel("Formula: ")
+        self.material_chemistry_dissolves_into = MaterialSelector("Dissolves into: ", mats=materials)
+        self.material_chemistry_composition = MaterialAmountList("Composition", mats=materials)
+
+        self.material_chemistry_container = QCollapsibleSection("Chemistry")
+        self.material_chemistry_container.addWidget(self.material_chemistry_formula)
+        self.material_chemistry_container.addWidget(self.material_chemistry_dissolves_into)
+        self.material_chemistry_container.addWidget(self.material_chemistry_composition)
 
 
         # adding widgets
@@ -345,6 +354,7 @@ class MainWindow(QMainWindow):
         self.material_editor_layout.addWidget(self.material_electronics_container)
         self.material_editor_layout.addWidget(self.material_visual_container)
         self.material_editor_layout.addWidget(self.material_misc_container)
+        self.material_editor_layout.addWidget(self.material_chemistry_container)
         
 
         self.material_editor_layout.setAlignment(Qt.AlignmentFlag.AlignTop)

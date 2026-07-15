@@ -15,6 +15,7 @@ from PyQt6.QtWidgets import (
     QColorDialog,
     QListWidget,
     QListWidgetItem,
+    QLineEdit,
 )
 from PyQt6.QtGui import (
     QIcon,
@@ -168,6 +169,32 @@ class QBooleanInputLabel(QWidget):
 
     def setValue(self, value: bool):
         self.input_field.setChecked(value)
+
+class QTextInputLabel(QWidget):
+    inputChanged = pyqtSignal(str)
+
+    def __init__(self, txt:str = "", placeholder:str = "", text:str = "", label:bool = True):
+        super().__init__()
+
+        self.label = QLabel(txt)
+        self.input_field = QLineEdit()
+        self.input_field.setPlaceholderText(placeholder)
+        self.input_field.setText(text)
+
+        self.input_field.textChanged.connect(self.inputChanged.emit)
+
+        layout = QHBoxLayout()
+        if label:
+            layout.addWidget(self.label)
+        layout.addWidget(self.input_field)
+        self.setLayout(layout)
+
+    def value(self) -> str:
+        return self.input_field.text()
+
+    def setValue(self, value: str):
+        self.input_field.setText(value)
+
 
 class MaterialSelector(QWidget):
     inputChanged = pyqtSignal(Material)

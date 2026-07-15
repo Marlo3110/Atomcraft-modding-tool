@@ -11,6 +11,8 @@ class Material:
     LocIdName: str = ""
     Description: str = "test material"
     State: State = State.SOLID
+    
+    Formula: str = None
 
     ProtonNumber: int = 0
     NeutronNumber: int = 0
@@ -243,9 +245,9 @@ class Material:
             Condensation=StateChange.fromJSON(data["Condensation"]), #  physics/thermodynamics
             Evaporation=StateChange.fromJSON(data["Evaporation"]), #  physics/thermodynamics
 
-            Fire=Fire.fromJSON(data["Fire"]), # visual
+            Fire=Fire.fromJSON(data["Fire"]), # combustion/fire
 
-            ExplosionRadius=data["ExplosionRadius"], # physics
+            ExplosionRadius=data["ExplosionRadius"], # combustion
             
             DropRates=DropRates.fromJSON(data["DropRates"]), # misc
 
