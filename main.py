@@ -255,6 +255,13 @@ class MainWindow(QMainWindow):
 
         # electronics
         
+        self.material_electronics_wire_index = QIntegerInputLabel("Wire index: ")
+        self.material_electronics_is_on = QBooleanInputLabel("Is on: ")
+
+        self.material_electronics_container = QCollapsibleSection("Electronics")
+        self.material_electronics_container.addWidget(self.material_electronics_wire_index)
+        self.material_electronics_container.addWidget(self.material_electronics_is_on)
+
         # visual
 
         #misc
@@ -276,6 +283,7 @@ class MainWindow(QMainWindow):
         self.material_editor_layout.addWidget(self.material_player_interaction_container)
         self.material_editor_layout.addWidget(self.material_physics_container)
         self.material_editor_layout.addWidget(self.material_plant_container)
+        self.material_editor_layout.addWidget(self.material_electronics_container)
 
         
 
