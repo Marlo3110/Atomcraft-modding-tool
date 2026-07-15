@@ -26,6 +26,7 @@ from PyQt6.QtCore import Qt, pyqtSignal, QMargins
 from material import (Material)
 from misc import (
                     StateChange,
+                    MaterialAmount
                  )
 from enum import Enum
 
@@ -123,7 +124,7 @@ class QCollapsibleSection(QWidget):
 class QIntegerInputLabel(QWidget):
     inputChanged = pyqtSignal(int)
 
-    def __init__(self, txt:str = "", prefix:str = "", minimum:int = 0, maximum:int = 999):
+    def __init__(self, txt:str = "", prefix:str = "", minimum:int = 0, maximum:int = 999, label:bool = True):
         super().__init__()
         self.label = QLabel(txt)
         self.input_field = QSpinBox()
@@ -135,7 +136,8 @@ class QIntegerInputLabel(QWidget):
         self.input_field.textChanged.connect(self.inputChanged.emit)
 
         layout = QHBoxLayout()
-        layout.addWidget(self.label)
+        if label:
+            layout.addWidget(self.label)
         layout.addWidget(self.input_field)
         self.setLayout(layout)
 
@@ -171,7 +173,7 @@ class MaterialSelector(QWidget):
     inputChanged = pyqtSignal(Material)
 
     def __init__(self, txt:str = "", mats:list[Material] = [], normal_value:Material|str = "", label:bool = True):
-        
+
         super().__init__()
         self.mats = mats
 
@@ -191,17 +193,125 @@ class MaterialSelector(QWidget):
 
         self.decider.editTextChanged.connect(self.__input_changed__)
 
-        layout = QHBoxLayout()
+        # store on self so subclasses (e.g. MaterialAmountSelector) can extend it
+        self.layout = QHBoxLayout()
         if label:
-            layout.addWidget(self.label)
-        layout.addWidget(self.decider)
-        self.setLayout(layout)
+            self.layout.addWidget(self.label)
+        self.layout.addWidget(self.decider)
+        self.setLayout(self.layout)
         self.setContentsMargins(QMargins(1, 1, 1, 1))
 
     def __input_changed__(self, txt:str):
         mat = find_material_in_materials(txt, mats=self.mats)
-        if mat != None:
+        if mat is not None:
             self.inputChanged.emit(mat)
+
+    def value(self) -> Material | None:
+        return find_material_in_materials(self.decider.currentText(), mats=self.mats)
+
+    def setValue(self, material: Material | str):
+        name = material.Name if isinstance(material, Material) else material
+        index = self.decider.findText(name)
+        if index != -1:
+            self.decider.setCurrentIndex(index)
+
+
+class MaterialAmountSelector(MaterialSelector):
+    inputChanged = pyqtSignal(MaterialAmount)
+
+    def __init__(self, txt:str = "", mats:list[Material] = [], normal_material_value:Material|str = "", label:bool = True):
+        super().__init__(txt=txt, mats=mats, normal_value=normal_material_value, label=label)
+        self.mats = mats
+
+        self.amount = QIntegerInputLabel(label=False, maximum=100000)
+        self.layout.addWidget(self.amount)
+
+        self.amount.inputChanged.connect(self.__input_changed__)
+        self.decider.editTextChanged.connect(self.__input_changed__)
+
+    def __input_changed__(self, *_):
+        mat = find_material_in_materials(self.decider.currentText(), mats=self.mats)
+        if mat is not None:
+            self.inputChanged.emit(MaterialAmount(mat, self.amount.input_field.value()))
+
+    def value(self) -> MaterialAmount | None:
+        mat = find_material_in_materials(self.decider.currentText(), mats=self.mats)
+        if mat is None:
+            return None
+        return MaterialAmount(mat, self.amount.input_field.value())
+
+    def setValue(self, value: MaterialAmount):
+        super().setValue(value.Material)
+        self.amount.input_field.setValue(value.Amount)
+
+
+# add list where you can add material amounts
+class MaterialAmountList(QWidget):
+    inputChanged = pyqtSignal(bool)  # emitted whenever the list changes
+
+    def __init__(self, text: str = "", mats: list[Material] = []):
+        super().__init__()
+
+        self.mats = mats
+        self.material_widgets: list[MaterialAmountSelector] = []
+
+        self.add_button = QPushButton("Add")
+        self.remove_button = QPushButton("Remove")
+        self.label = QLabel(text=text)
+
+        self.title_bar_layout = QHBoxLayout()
+        self.title_bar_layout.addWidget(self.label)
+        self.title_bar_layout.addWidget(self.add_button)
+        self.title_bar_layout.addWidget(self.remove_button)
+
+        self.title_bar = QWidget()
+        self.title_bar.setLayout(self.title_bar_layout)
+
+        self.list = QListWidget()
+
+        self.layout = QVBoxLayout()
+        self.layout.addWidget(self.title_bar)
+        self.layout.addWidget(self.list)
+
+        self.setLayout(self.layout)
+
+        self.add_button.clicked.connect(self.__new_material__)
+        self.remove_button.clicked.connect(self.__remove_material__)
+
+    def __new_material__(self):
+        selector = MaterialAmountSelector(mats=self.mats, label=False)
+        selector.inputChanged.connect(lambda _: self.inputChanged.emit(True))
+
+        item = QListWidgetItem(self.list)
+        item.setSizeHint(selector.sizeHint())
+
+        self.list.addItem(item)
+        self.list.setItemWidget(item, selector)
+
+        self.material_widgets.append(selector)
+        self.inputChanged.emit(True)
+
+    def __remove_material__(self):
+        if len(self.material_widgets) == 0:
+            return
+
+        row = self.list.currentRow()
+        if row == -1:
+            row = len(self.material_widgets) - 1
+
+        self.material_widgets.pop(row)
+        self.list.takeItem(row)
+
+        self.inputChanged.emit(True)
+
+    def get_material_amounts(self) -> list[MaterialAmount]:
+        """Return the MaterialAmount objects currently set in the list."""
+        amounts = []
+        for selector in self.material_widgets:
+            amount = selector.value()
+            if amount is not None:
+                amounts.append(amount)
+        return amounts
 
 # add list where you can add materials
 class MaterialList(QWidget):

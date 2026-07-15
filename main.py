@@ -21,6 +21,7 @@ from gui_utils import   (
                         QStateChange,
                         QColorSelector,
                         MaterialList,
+                        MaterialAmountList,
                         )
 
 material_fetcher = fetcher.MaterialFetcher()
@@ -306,6 +307,22 @@ class MainWindow(QMainWindow):
 
         # misc
 
+        self.material_misc_can_be_cut_by_plasma = QBooleanInputLabel("Can be cut by plasma: ")
+        self.material_misc_do_not_block_laser = QBooleanInputLabel("Do not block laser: ")
+        self.material_misc_is_built = QBooleanInputLabel("Is built: ")
+        self.material_misc_do_not_show_in_guide = QBooleanInputLabel("Do not show guide: ")
+        self.material_misc_material_audio_type_id = QIntegerInputLabel("Material audio type id: ")
+        self.material_misc_drop_rates = MaterialAmountList("Drop rates", mats=materials)
+
+        self.material_misc_container = QCollapsibleSection("Miscellaneous")
+        self.material_misc_container.addWidget(self.material_misc_can_be_cut_by_plasma)
+        self.material_misc_container.addWidget(self.material_misc_do_not_block_laser)
+        self.material_misc_container.addWidget(self.material_misc_is_built)
+        self.material_misc_container.addWidget(self.material_misc_do_not_show_in_guide)
+        self.material_misc_container.addWidget(self.material_misc_material_audio_type_id)
+        self.material_misc_container.addWidget(self.material_misc_drop_rates)
+
+
         # chemistry
 
 
@@ -327,6 +344,7 @@ class MainWindow(QMainWindow):
         self.material_editor_layout.addWidget(self.material_plant_container)
         self.material_editor_layout.addWidget(self.material_electronics_container)
         self.material_editor_layout.addWidget(self.material_visual_container)
+        self.material_editor_layout.addWidget(self.material_misc_container)
         
 
         self.material_editor_layout.setAlignment(Qt.AlignmentFlag.AlignTop)
